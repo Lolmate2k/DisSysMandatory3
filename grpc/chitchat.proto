@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package chitchat;
+
+option go_package = "chitchat/grpc;chitchat";
+
+// TODO: design the service (see report questions on streaming type).
+service ChitChat {
+  // rpc Join(...) returns (stream ...);
+  // rpc Publish(...) returns (...);
+  // rpc Leave(...) returns (...);
+}
+
+// TODO: define message types (e.g. join request, chat message, broadcast with Lamport timestamp).
