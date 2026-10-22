@@ -4,14 +4,12 @@ package chitchat;
 
 option go_package = "chitchat/grpc;chitchat";
 
-// TODO: design the service (see report questions on streaming type).
 service ChitChat {
   rpc Join(JoinRequest) returns (stream Broadcast);
   rpc Publish(PublishRequest) returns (PublishResponse);
   rpc Leave(LeaveRequest) returns (LeaveResponse);
 }
 
-// TODO: define message types (e.g. join request, chat message, broadcast with Lamport timestamp).
 message Broadcast  {
   string content = 1;
   int64 lamportTime = 2;
@@ -37,5 +35,5 @@ message LeaveRequest {
 }
 
 message LeaveResponse {
-  int64 lamportTime = 2;
+  int64 lamportTime = 1;
 }
