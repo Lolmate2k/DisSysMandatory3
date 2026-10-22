@@ -43,4 +43,44 @@ func main() {
 	}
 }
 
-// TODO: implement Join, Publish, Leave, Logging
+
+func (s *chatServer) Join (request *pb.JoinRequest) (*pb.JoinResponse, error) {
+	// TODO: Implement Join logic
+	username := request.Username
+
+	s.mu.Lock() // We lock the data.
+	defer s.mu.Unlock() // We unlock the data after return.
+
+	if s.clients[username] != nil { // Check if the channel already exists.
+		return nil, fmt.Errorf("channel with username %s is already taken", username)
+	}
+
+	s.clients[username] = make(chan *pb.Broadcast) // Create channel for the user/client.
+	
+	return &pb.JoinResponse{}, nil
+}
+
+func (s *chatServer) Publish (request *pb.PublishRequest) (*pb.PublishResponse, error) {
+	// TODO: Implement Publish logic
+
+	return &pb.PublishResponse{}, nil
+}
+
+func (s *chatServer) Leave (request *pb.LeaveRequest) (*pb.LeaveResponse, error) {
+	// TODO: Implement Leave logic
+	username := request.Username
+	// TODO: We need to update lamport clock here aswell.
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if s.clients[username] == nil {
+		return nil, fmt.Errorf("channel with username %s does not exist", username)
+	}
+	
+	delete(s.clients, username)
+
+	return &pb.LeaveResponse{}, nil
+}
+
+// TODO: implement Logging
