@@ -1,11 +1,12 @@
 package main
 
 import (
+	pb "chitchat/grpc"
+	"context"
+	"fmt"
 	"log"
 	"net"
 	"sync"
-
-	pb "chitchat/grpc"
 
 	"google.golang.org/grpc"
 )
@@ -13,13 +14,13 @@ import (
 type chatServer struct {
 	pb.UnimplementedChitChatServer
 
-	mu sync.Mutex
+	mu      sync.Mutex
 	clients map[string]chan *pb.Broadcast
-	clock int64
+	clock   int64
 }
 
 func (s *chatServer) tick(recieved int64) int64 {
-	s.clock = max(recieved, s.clock)+1
+	s.clock = max(recieved, s.clock) + 1
 	return s.clock
 }
 
@@ -28,7 +29,6 @@ func newChatServer() *chatServer {
 		clients: make(map[string]chan *pb.Broadcast),
 	}
 }
-
 
 func main() {
 	lis, err := net.Listen("tcp", ":50051")
@@ -43,32 +43,30 @@ func main() {
 	}
 }
 
+func (s *chatServer) Join(request *pb.JoinRequest, stream grpc.ServerStreamingServer[pb.Broadcast]) error {
+	username := request.GetUsername()
 
-func (s *chatServer) Join (request *pb.JoinRequest) (*pb.JoinResponse, error) {
-	// TODO: Implement Join logic
-	username := request.Username
-
-	s.mu.Lock() // We lock the data.
+	s.mu.Lock()         // We lock the data.
 	defer s.mu.Unlock() // We unlock the data after return.
 
 	if s.clients[username] != nil { // Check if the channel already exists.
-		return nil, fmt.Errorf("channel with username %s is already taken", username)
+		return fmt.Errorf("channel with username %s is already taken", username)
 	}
 
 	s.clients[username] = make(chan *pb.Broadcast) // Create channel for the user/client.
-	
-	return &pb.JoinResponse{}, nil
+
+	return nil
 }
 
-func (s *chatServer) Publish (request *pb.PublishRequest) (*pb.PublishResponse, error) {
+func (s *chatServer) Publish(ctx context.Context, request *pb.PublishRequest) (*pb.PublishResponse, error) {
 	// TODO: Implement Publish logic
 
 	return &pb.PublishResponse{}, nil
 }
 
-func (s *chatServer) Leave (request *pb.LeaveRequest) (*pb.LeaveResponse, error) {
+func (s *chatServer) Leave(ctx context.Context, request *pb.LeaveRequest) (*pb.LeaveResponse, error) {
 	// TODO: Implement Leave logic
-	username := request.Username
+	username := request.GetUsername()
 	// TODO: We need to update lamport clock here aswell.
 
 	s.mu.Lock()
@@ -77,10 +75,10 @@ func (s *chatServer) Leave (request *pb.LeaveRequest) (*pb.LeaveResponse, error)
 	if s.clients[username] == nil {
 		return nil, fmt.Errorf("channel with username %s does not exist", username)
 	}
-	
+
 	delete(s.clients, username)
 
-	return &pb.LeaveResponse{}, nil
+	return &pb.LeaveResponse{LamportTime: s.clock}, nil
 }
 
 // TODO: implement Logging

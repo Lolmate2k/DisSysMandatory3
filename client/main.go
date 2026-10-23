@@ -1,16 +1,15 @@
 package main
 
 import (
-	"Context"
-	"io"
+	"context"
 	"log"
 	"time"
 
 	pb "chitchat/grpc"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
-
 
 func main() {
 
@@ -20,10 +19,10 @@ func main() {
 	}
 	defer conn.Close()
 
-	c := pb.NewChitChatClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	client := pb.NewChitChatClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 
+	defer cancel()
 
 	// TODO: connect to server, join, publish, leave
 }
