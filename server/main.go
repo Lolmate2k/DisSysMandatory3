@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"sync"
+	"unicode/utf8"
 
 	"google.golang.org/grpc"
 )
@@ -53,15 +54,68 @@ func (s *chatServer) Join(request *pb.JoinRequest, stream grpc.ServerStreamingSe
 		return fmt.Errorf("channel with username %s is already taken", username)
 	}
 
-	s.clients[username] = make(chan *pb.Broadcast) // Create channel for the user/client.
+	s.clients[username] = make(chan *pb.Broadcast, 100) // Create channel for the user/client.
+	ch := s.clients[username]
+	log.Printf("[Server] event=CLIENT_CONNECT client=%s lamport=%d", username, s.clock)
+	s.mu.Unlock() // release the lock while this client is connected
+
+	connectionLost := false
+deliver:
+	for {
+		select {
+		case msg, ok := <-ch:
+			if !ok {
+				break deliver
+			}
+			if err := stream.Send(msg); err != nil {
+				log.Printf("[Server] event=SEND_FAILED client=%s err=%v", username, err)
+				connectionLost = true
+				break deliver
+			}
+			log.Printf("[Server] event=DELIVER client=%s lamport=%d", username, msg.GetLamportTime())
+
+		case <-stream.Context().Done():
+			connectionLost = true
+			break deliver
+		}
+	}
+
+	s.mu.Lock()
+	if connectionLost && s.clients[username] == ch {
+		delete(s.clients, username)
+		close(ch)
+		log.Printf("[Server] event=CLIENT_DISCONNECT client=%s reason=connection_lost", username)
+	}
 
 	return nil
 }
 
 func (s *chatServer) Publish(ctx context.Context, request *pb.PublishRequest) (*pb.PublishResponse, error) {
 	// TODO: Implement Publish logic
+	username := request.GetUsername()
+	content := request.GetContent()
 
-	return &pb.PublishResponse{}, nil
+	if !utf8.ValidString(content) || utf8.RuneCountInString(content) > 128 {
+		return nil, fmt.Errorf("invalid message: must be valid UTF-8 and at most 128 characters")
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if s.clients[username] == nil {
+		return nil, fmt.Errorf("user %s has not joined", username)
+	}
+
+	s.tick(request.GetLamportTime()) // Lamport receive event
+	log.Printf("[Server] event=PUBLISH_RECEIVED client=%s lamport=%d", username, s.clock)
+
+	ts := s.tick(0)
+	s.broadcast(&pb.Broadcast{
+		Content:     username + ": " + content,
+		LamportTime: ts,
+	})
+
+	return &pb.PublishResponse{LamportTime: ts}, nil
 }
 
 func (s *chatServer) Leave(ctx context.Context, request *pb.LeaveRequest) (*pb.LeaveResponse, error) {
@@ -76,9 +130,22 @@ func (s *chatServer) Leave(ctx context.Context, request *pb.LeaveRequest) (*pb.L
 		return nil, fmt.Errorf("channel with username %s does not exist", username)
 	}
 
+	s.tick(request.GetLamportTime())
+	close(s.clients[username])
+	log.Printf("[Server] event=CLIENT_LEAVE client=%s lamport=%d", username, s.clock)
+
 	delete(s.clients, username)
 
 	return &pb.LeaveResponse{LamportTime: s.clock}, nil
 }
 
-// TODO: implement Logging
+func (s *chatServer) broadcast(msg *pb.Broadcast) {
+	log.Printf("[Server] event=BROADCAST lamport=%d content=%q recipients=%d", msg.GetLamportTime(), msg.GetContent(), len(s.clients))
+	for username, ch := range s.clients {
+		select {
+		case ch <- msg:
+		default:
+			log.Printf("[Server] event=DROP client=%s reason=buffer_full lamport=%d", username, msg.GetLamportTime())
+		}
+	}
+}
