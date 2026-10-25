@@ -33,3 +33,5 @@ Make CLIENT_NAME the wanted name for the client.
 Make sure to use ONE terminal for ONE client.
 Duplicate names are not possible.
 
+Connected clients send messages by typing them out afteer joining, and pressing enter.
+
