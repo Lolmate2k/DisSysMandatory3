@@ -18,5 +18,18 @@ protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=p
 ```
 
 ## Run
+To use the program, start by starting a server, and then start clients
 
-TODO: how to start the server and clients.
+To start the server:
+```bash
+go run ./server
+```
+
+To start a client:
+```bash
+go run ./client -name <CLIENT_NAME>
+```
+Make CLIENT_NAME the wanted name for the client.
+Make sure to use ONE terminal for ONE client.
+Duplicate names are not possible.
+

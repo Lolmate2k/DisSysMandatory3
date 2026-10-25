@@ -1,0 +1,55 @@
+2026/10/25 22:18:43 [Server] event=SERVER_START addr=:50051
+2026/10/25 22:18:45 [Server] event=CLIENT_CONNECT client=alice lamport=0
+2026/10/25 22:18:45 [Server] event=BROADCAST lamport=1 content="Participant alice joined Chit Chat at logical time 1" recipients=1
+2026/10/25 22:18:45 [Server] event=JOIN_BROADCAST client=alice lamport=1
+2026/10/25 22:18:45 [Server] event=DELIVER client=alice lamport=1
+2026/10/25 22:18:46 [Server] event=CLIENT_CONNECT client=bob lamport=1
+2026/10/25 22:18:46 [Server] event=BROADCAST lamport=2 content="Participant bob joined Chit Chat at logical time 2" recipients=2
+2026/10/25 22:18:46 [Server] event=JOIN_BROADCAST client=bob lamport=2
+2026/10/25 22:18:46 [Server] event=DELIVER client=bob lamport=2
+2026/10/25 22:18:46 [Server] event=DELIVER client=alice lamport=2
+2026/10/25 22:18:46 [Server] event=CLIENT_CONNECT client=carol lamport=2
+2026/10/25 22:18:46 [Server] event=BROADCAST lamport=3 content="Participant carol joined Chit Chat at logical time 3" recipients=3
+2026/10/25 22:18:46 [Server] event=JOIN_BROADCAST client=carol lamport=3
+2026/10/25 22:18:46 [Server] event=DELIVER client=carol lamport=3
+2026/10/25 22:18:46 [Server] event=DELIVER client=alice lamport=3
+2026/10/25 22:18:46 [Server] event=DELIVER client=bob lamport=3
+2026/10/25 22:18:47 [Server] event=PUBLISH_RECEIVED client=alice lamport=6
+2026/10/25 22:18:47 [Server] event=BROADCAST lamport=7 content="alice: Hello everyone, alice here" recipients=3
+2026/10/25 22:18:47 [Server] event=DELIVER client=alice lamport=7
+2026/10/25 22:18:47 [Server] event=DELIVER client=bob lamport=7
+2026/10/25 22:18:47 [Server] event=DELIVER client=carol lamport=7
+2026/10/25 22:18:48 [Server] event=PUBLISH_RECEIVED client=bob lamport=10
+2026/10/25 22:18:48 [Server] event=BROADCAST lamport=11 content="bob: Hi alice, bob here" recipients=3
+2026/10/25 22:18:48 [Server] event=DELIVER client=alice lamport=11
+2026/10/25 22:18:48 [Server] event=DELIVER client=carol lamport=11
+2026/10/25 22:18:48 [Server] event=DELIVER client=bob lamport=11
+2026/10/25 22:18:48 [Server] event=PUBLISH_RECEIVED client=carol lamport=14
+2026/10/25 22:18:48 [Server] event=BROADCAST lamport=15 content="carol: carol says hi" recipients=3
+2026/10/25 22:18:48 [Server] event=DELIVER client=bob lamport=15
+2026/10/25 22:18:48 [Server] event=DELIVER client=carol lamport=15
+2026/10/25 22:18:48 [Server] event=DELIVER client=alice lamport=15
+2026/10/25 22:18:49 [Server] event=BROADCAST lamport=19 content="Participant carol left Chit Chat at logical time 19" recipients=2
+2026/10/25 22:18:49 [Server] event=LEAVE_BROADCAST client=carol lamport=19
+2026/10/25 22:18:49 [Server] event=CLIENT_LEAVE client=carol lamport=19
+2026/10/25 22:18:49 [Server] event=DELIVER client=alice lamport=19
+2026/10/25 22:18:49 [Server] event=DELIVER client=bob lamport=19
+2026/10/25 22:18:51 [Server] event=PUBLISH_RECEIVED client=alice lamport=22
+2026/10/25 22:18:51 [Server] event=BROADCAST lamport=23 content="alice: Carol has left, only alice and bob remain" recipients=2
+2026/10/25 22:18:51 [Server] event=DELIVER client=alice lamport=23
+2026/10/25 22:18:51 [Server] event=DELIVER client=bob lamport=23
+2026/10/25 22:18:51 [Server] event=PUBLISH_RECEIVED client=bob lamport=26
+2026/10/25 22:18:51 [Server] event=BROADCAST lamport=27 content="bob: Agreed" recipients=2
+2026/10/25 22:18:51 [Server] event=DELIVER client=alice lamport=27
+2026/10/25 22:18:51 [Server] event=DELIVER client=bob lamport=27
+2026/10/25 22:18:52 [Server] event=BROADCAST lamport=31 content="Participant bob left Chit Chat at logical time 31" recipients=1
+2026/10/25 22:18:52 [Server] event=LEAVE_BROADCAST client=bob lamport=31
+2026/10/25 22:18:52 [Server] event=CLIENT_LEAVE client=bob lamport=31
+2026/10/25 22:18:52 [Server] event=DELIVER client=alice lamport=31
+2026/10/25 22:18:54 [Server] event=PUBLISH_RECEIVED client=alice lamport=34
+2026/10/25 22:18:54 [Server] event=BROADCAST lamport=35 content="alice: Just me now" recipients=1
+2026/10/25 22:18:54 [Server] event=DELIVER client=alice lamport=35
+2026/10/25 22:18:54 [Server] event=BROADCAST lamport=39 content="Participant alice left Chit Chat at logical time 39" recipients=0
+2026/10/25 22:18:54 [Server] event=LEAVE_BROADCAST client=alice lamport=39
+2026/10/25 22:18:54 [Server] event=CLIENT_LEAVE client=alice lamport=39
+2026/10/25 22:18:56 [Server] event=SHUTDOWN

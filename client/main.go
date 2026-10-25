@@ -92,7 +92,6 @@ func main() {
 		}
 	}()
 
-	// TODO: join, publish, leave
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 	<-sig
@@ -105,7 +104,6 @@ func main() {
 	time.Sleep(500 * time.Millisecond)
 }
 
-// TODO: Impolement the logic below:
 func (c *chatClient) Join(ctx context.Context, request *pb.JoinRequest) (grpc.ServerStreamingClient[pb.Broadcast], error) {
 	// Joining does NOT increment clock.
 	stream, err := c.client.Join(context.WithoutCancel(ctx), request)

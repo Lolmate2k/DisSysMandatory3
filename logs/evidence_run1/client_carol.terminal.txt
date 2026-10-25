@@ -1,0 +1,4 @@
+[carol | L=3] Participant carol joined Chit Chat at logical time 3
+[carol | L=7] alice: Hello everyone, alice here
+[carol | L=11] bob: Hi alice, bob here
+[carol | L=15] carol: carol says hi

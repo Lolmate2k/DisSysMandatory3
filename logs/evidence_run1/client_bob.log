@@ -1,0 +1,13 @@
+2026/10/25 22:18:46 [Client bob] event=JOINED lamport=0
+2026/10/25 22:18:46 [Client bob] event=MESSAGE_RECEIVED msg_lamport=2 local_lamport=3 content="Participant bob joined Chit Chat at logical time 2"
+2026/10/25 22:18:46 [Client bob] event=MESSAGE_RECEIVED msg_lamport=3 local_lamport=4 content="Participant carol joined Chit Chat at logical time 3"
+2026/10/25 22:18:47 [Client bob] event=MESSAGE_RECEIVED msg_lamport=7 local_lamport=8 content="alice: Hello everyone, alice here"
+2026/10/25 22:18:48 [Client bob] event=PUBLISH_SENT lamport=9 content="Hi alice, bob here"
+2026/10/25 22:18:48 [Client bob] event=MESSAGE_RECEIVED msg_lamport=11 local_lamport=12 content="bob: Hi alice, bob here"
+2026/10/25 22:18:48 [Client bob] event=MESSAGE_RECEIVED msg_lamport=15 local_lamport=16 content="carol: carol says hi"
+2026/10/25 22:18:49 [Client bob] event=MESSAGE_RECEIVED msg_lamport=19 local_lamport=20 content="Participant carol left Chit Chat at logical time 19"
+2026/10/25 22:18:51 [Client bob] event=MESSAGE_RECEIVED msg_lamport=23 local_lamport=24 content="alice: Carol has left, only alice and bob remain"
+2026/10/25 22:18:51 [Client bob] event=PUBLISH_SENT lamport=25 content="Agreed"
+2026/10/25 22:18:51 [Client bob] event=MESSAGE_RECEIVED msg_lamport=27 local_lamport=28 content="bob: Agreed"
+2026/10/25 22:18:52 [Client bob] event=LEAVE_SENT lamport=30
+2026/10/25 22:18:52 [Client bob] event=STREAM_CLOSED

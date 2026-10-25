@@ -1,0 +1,8 @@
+[bob | L=2] Participant bob joined Chit Chat at logical time 2
+[bob | L=3] Participant carol joined Chit Chat at logical time 3
+[bob | L=7] alice: Hello everyone, alice here
+[bob | L=11] bob: Hi alice, bob here
+[bob | L=15] carol: carol says hi
+[bob | L=19] Participant carol left Chit Chat at logical time 19
+[bob | L=23] alice: Carol has left, only alice and bob remain
+[bob | L=27] bob: Agreed

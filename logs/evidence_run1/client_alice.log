@@ -1,0 +1,17 @@
+2026/10/25 22:18:45 [Client alice] event=JOINED lamport=0
+2026/10/25 22:18:45 [Client alice] event=MESSAGE_RECEIVED msg_lamport=1 local_lamport=2 content="Participant alice joined Chit Chat at logical time 1"
+2026/10/25 22:18:46 [Client alice] event=MESSAGE_RECEIVED msg_lamport=2 local_lamport=3 content="Participant bob joined Chit Chat at logical time 2"
+2026/10/25 22:18:46 [Client alice] event=MESSAGE_RECEIVED msg_lamport=3 local_lamport=4 content="Participant carol joined Chit Chat at logical time 3"
+2026/10/25 22:18:47 [Client alice] event=PUBLISH_SENT lamport=5 content="Hello everyone, alice here"
+2026/10/25 22:18:47 [Client alice] event=MESSAGE_RECEIVED msg_lamport=7 local_lamport=9 content="alice: Hello everyone, alice here"
+2026/10/25 22:18:48 [Client alice] event=MESSAGE_RECEIVED msg_lamport=11 local_lamport=12 content="bob: Hi alice, bob here"
+2026/10/25 22:18:48 [Client alice] event=MESSAGE_RECEIVED msg_lamport=15 local_lamport=16 content="carol: carol says hi"
+2026/10/25 22:18:49 [Client alice] event=MESSAGE_RECEIVED msg_lamport=19 local_lamport=20 content="Participant carol left Chit Chat at logical time 19"
+2026/10/25 22:18:51 [Client alice] event=PUBLISH_SENT lamport=21 content="Carol has left, only alice and bob remain"
+2026/10/25 22:18:51 [Client alice] event=MESSAGE_RECEIVED msg_lamport=23 local_lamport=24 content="alice: Carol has left, only alice and bob remain"
+2026/10/25 22:18:51 [Client alice] event=MESSAGE_RECEIVED msg_lamport=27 local_lamport=28 content="bob: Agreed"
+2026/10/25 22:18:52 [Client alice] event=MESSAGE_RECEIVED msg_lamport=31 local_lamport=32 content="Participant bob left Chit Chat at logical time 31"
+2026/10/25 22:18:54 [Client alice] event=PUBLISH_SENT lamport=33 content="Just me now"
+2026/10/25 22:18:54 [Client alice] event=MESSAGE_RECEIVED msg_lamport=35 local_lamport=36 content="alice: Just me now"
+2026/10/25 22:18:54 [Client alice] event=LEAVE_SENT lamport=38
+2026/10/25 22:18:54 [Client alice] event=STREAM_CLOSED

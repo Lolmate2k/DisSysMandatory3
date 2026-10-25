@@ -119,7 +119,6 @@ deliver:
 }
 
 func (s *chatServer) Publish(ctx context.Context, request *pb.PublishRequest) (*pb.PublishResponse, error) {
-	// TODO: Implement Publish logic
 	username := request.GetUsername()
 	content := request.GetContent()
 
@@ -147,9 +146,7 @@ func (s *chatServer) Publish(ctx context.Context, request *pb.PublishRequest) (*
 }
 
 func (s *chatServer) Leave(ctx context.Context, request *pb.LeaveRequest) (*pb.LeaveResponse, error) {
-	// TODO: Implement Leave logic
 	username := request.GetUsername()
-	// TODO: We need to update lamport clock here aswell.
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -159,15 +156,18 @@ func (s *chatServer) Leave(ctx context.Context, request *pb.LeaveRequest) (*pb.L
 	}
 
 	s.tick(request.GetLamportTime())
+
+	ch := s.clients[username]
+	delete(s.clients, username)
+	close(ch)
+
 	s.broadcast(&pb.Broadcast{
 		Content:     fmt.Sprintf("Participant %s left Chit Chat at logical time %d", username, s.clock),
 		LamportTime: s.clock,
 	})
-	close(s.clients[username])
 	log.Printf("[Server] event=LEAVE_BROADCAST client=%s lamport=%d", username, s.clock)
 	log.Printf("[Server] event=CLIENT_LEAVE client=%s lamport=%d", username, s.clock)
 
-	delete(s.clients, username)
 
 	return &pb.LeaveResponse{LamportTime: s.clock}, nil
 }
