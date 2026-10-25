@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"sync"
+	"os"
 	"unicode/utf8"
 
 	"google.golang.org/grpc"
@@ -32,13 +33,20 @@ func newChatServer() *chatServer {
 }
 
 func main() {
+	logFile, err := os.OpenFile("logs/server.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("Failed to open log file: %v", err)
+	}
+	defer logFile.Close()
+	log.SetOutput(logFile)
+
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
 	pb.RegisterChitChatServer(grpcServer, newChatServer())
-	log.Println("Server listening on :50051")
+	fmt.Println("[Server] Server listening on :50051")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
@@ -57,6 +65,11 @@ func (s *chatServer) Join(request *pb.JoinRequest, stream grpc.ServerStreamingSe
 	s.clients[username] = make(chan *pb.Broadcast, 100) // Create channel for the user/client.
 	ch := s.clients[username]
 	log.Printf("[Server] event=CLIENT_CONNECT client=%s lamport=%d", username, s.clock)
+	s.broadcast(&pb.Broadcast{
+		Content:	fmt.Sprintf("Participant %s joined Chit Chat at logical time %d", username, s.clock),
+		LamportTime: s.clock,
+	})
+	log.Printf("[Server] event=JOIN_BROADCAST client=%s lamport=%d", username, s.clock)
 	s.mu.Unlock() // release the lock while this client is connected
 
 	connectionLost := false
