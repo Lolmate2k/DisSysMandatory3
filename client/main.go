@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	pb "chitchat/grpc"
 	"context"
 	"flag"
@@ -12,11 +13,12 @@ import (
 	"sync/atomic"
 	"syscall"
 	"time"
-	"bufio"
 	"unicode/utf8"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 )
 
 type chatClient struct {
@@ -58,13 +60,21 @@ func main() {
 	client := newClient(*name, conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 
-	client.Join(ctx, &pb.JoinRequest{Username: client.username})
+	if _, err := client.Join(ctx, &pb.JoinRequest{Username: client.username}); err != nil {
+		if status.Code(err) == codes.AlreadyExists {
+			fmt.Printf("The username %q is already taken.\n", *name)
+		} else {
+			fmt.Println("Could not join:", err)
+		}
+		cancel()
+		return
+	}
 
 	defer cancel()
 
 	go func() {
 		scanner := bufio.NewScanner(os.Stdin)
-		for (scanner.Scan()) {
+		for scanner.Scan() {
 			line := scanner.Text()
 			if line == "" {
 				continue
@@ -103,8 +113,15 @@ func (c *chatClient) Join(ctx context.Context, request *pb.JoinRequest) (grpc.Se
 		log.Printf("[Client %s] event=JOIN_FAILED err=%v", c.username, err)
 		return nil, err
 	}
+
+	first, err := stream.Recv()
+	if err != nil {
+		log.Printf("[Client %s] event=JOIN_REJECTED err=%v", c.username, err)
+		return nil, err
+	}
 	log.Printf("[Client %s] event=JOINED lamport=%d", c.username, atomic.LoadInt64(&c.clock))
 
+	c.handle(first)
 	go c.receive(stream)
 	return stream, nil
 }
@@ -152,6 +169,13 @@ func (c *chatClient) receive(stream grpc.ServerStreamingClient[pb.Broadcast]) {
 		log.Printf("[Client %s] event=MESSAGE_RECEIVED msg_lamport=%d local_lamport=%d content=%q",
 			c.username, msg.GetLamportTime(), local, msg.GetContent())
 	}
+
+}
+func (c *chatClient) handle(msg *pb.Broadcast) {
+	local := c.tickRecv(msg.GetLamportTime())
+	fmt.Printf("[%s | L=%d] %s\n", c.username, msg.GetLamportTime(), msg.GetContent())
+	log.Printf("[Client %s] event=MESSAGE_RECEIVED msg_lamport=%d local_lamport=%d content=%q",
+		c.username, msg.GetLamportTime(), local, msg.GetContent())
 }
 
 func (c *chatClient) tickSend() int64 {
