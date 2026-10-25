@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"sync"
 	"os"
+	"sync"
 	"unicode/utf8"
 
 	"google.golang.org/grpc"
@@ -66,7 +66,7 @@ func (s *chatServer) Join(request *pb.JoinRequest, stream grpc.ServerStreamingSe
 	ch := s.clients[username]
 	log.Printf("[Server] event=CLIENT_CONNECT client=%s lamport=%d", username, s.clock)
 	s.broadcast(&pb.Broadcast{
-		Content:	fmt.Sprintf("Participant %s joined Chit Chat at logical time %d", username, s.clock),
+		Content:     fmt.Sprintf("Participant %s joined Chit Chat at logical time %d", username, s.clock),
 		LamportTime: s.clock,
 	})
 	log.Printf("[Server] event=JOIN_BROADCAST client=%s lamport=%d", username, s.clock)
@@ -144,7 +144,12 @@ func (s *chatServer) Leave(ctx context.Context, request *pb.LeaveRequest) (*pb.L
 	}
 
 	s.tick(request.GetLamportTime())
+	s.broadcast(&pb.Broadcast{
+		Content:     fmt.Sprintf("Participant %s left Chit Chat at logical time %d", username, s.clock),
+		LamportTime: s.clock,
+	})
 	close(s.clients[username])
+	log.Printf("[Server] event=JOIN_BROADCAST client=%s lamport=%d", username, s.clock)
 	log.Printf("[Server] event=CLIENT_LEAVE client=%s lamport=%d", username, s.clock)
 
 	delete(s.clients, username)

@@ -1,0 +1,28 @@
+2026/10/25 21:34:14 [Client bob] event=JOINED lamport=0
+2026/10/25 21:34:14 [Client bob] event=MESSAGE_RECEIVED msg_lamport=0 local_lamport=1 content="Participant bob joined Chit Chat at logical time 0"
+2026/10/25 21:34:18 [Client bob] event=LEAVE_SENT lamport=2
+2026/10/25 21:34:18 [Client bob] event=STREAM_ERROR err=rpc error: code = Unavailable desc = error reading from server: EOF
+2026/10/25 21:34:18 [Client bob] event=LEAVE_FAILED err=rpc error: code = Unavailable desc = error reading from server: EOF
+2026/10/25 21:34:38 [Client bob] event=JOINED lamport=0
+2026/10/25 21:34:38 [Client bob] event=MESSAGE_RECEIVED msg_lamport=0 local_lamport=1 content="Participant bob joined Chit Chat at logical time 0"
+2026/10/25 21:34:44 [Client bob] event=LEAVE_SENT lamport=2
+2026/10/25 21:34:44 [Client bob] event=LEAVE_FAILED err=rpc error: code = Unavailable desc = error reading from server: EOF
+2026/10/25 21:34:44 [Client bob] event=STREAM_ERROR err=rpc error: code = Unavailable desc = error reading from server: EOF
+2026/10/25 21:35:09 [Client bob] event=JOINED lamport=0
+2026/10/25 21:35:09 [Client bob] event=MESSAGE_RECEIVED msg_lamport=0 local_lamport=1 content="Participant bob joined Chit Chat at logical time 0"
+2026/10/25 21:35:16 [Client bob] event=LEAVE_SENT lamport=2
+2026/10/25 21:35:16 [Client bob] event=MESSAGE_RECEIVED msg_lamport=3 local_lamport=5 content="Participant bob left Chit Chat at logical time 3"
+2026/10/25 21:35:16 [Client bob] event=STREAM_CLOSED
+2026/10/25 21:35:25 [Client bob] event=JOINED lamport=0
+2026/10/25 21:35:25 [Client bob] event=MESSAGE_RECEIVED msg_lamport=3 local_lamport=4 content="Participant bob joined Chit Chat at logical time 3"
+2026/10/25 21:35:29 [Client bob] event=STREAM_ERROR err=rpc error: code = Unavailable desc = error reading from server: EOF
+2026/10/25 21:35:45 [Client bob] event=LEAVE_SENT lamport=5
+2026/10/25 21:35:45 [Client bob] event=LEAVE_FAILED err=rpc error: code = Unknown desc = channel with username bob does not exist
+2026/10/25 21:35:54 [Client bob] event=JOINED lamport=0
+2026/10/25 21:35:54 [Client bob] event=MESSAGE_RECEIVED msg_lamport=0 local_lamport=1 content="Participant bob joined Chit Chat at logical time 0"
+2026/10/25 21:36:20 [Client bob] event=STREAM_ERROR err=rpc error: code = Unavailable desc = error reading from server: EOF
+2026/10/25 21:36:47 [Client Bob] event=JOINED lamport=0
+2026/10/25 21:36:47 [Client Bob] event=MESSAGE_RECEIVED msg_lamport=0 local_lamport=1 content="Participant Bob joined Chit Chat at logical time 0"
+2026/10/25 21:37:16 [Client Bob] event=LEAVE_SENT lamport=2
+2026/10/25 21:37:16 [Client Bob] event=MESSAGE_RECEIVED msg_lamport=3 local_lamport=4 content="Participant Bob left Chit Chat at logical time 3"
+2026/10/25 21:37:16 [Client Bob] event=STREAM_CLOSED
