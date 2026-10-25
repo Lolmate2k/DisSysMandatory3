@@ -65,9 +65,10 @@ func (s *chatServer) Join(request *pb.JoinRequest, stream grpc.ServerStreamingSe
 	s.clients[username] = make(chan *pb.Broadcast, 100) // Create channel for the user/client.
 	ch := s.clients[username]
 	log.Printf("[Server] event=CLIENT_CONNECT client=%s lamport=%d", username, s.clock)
+	ts := s.tick(0)
 	s.broadcast(&pb.Broadcast{
-		Content:     fmt.Sprintf("Participant %s joined Chit Chat at logical time %d", username, s.clock),
-		LamportTime: s.clock,
+		Content:	fmt.Sprintf("Participant %s joined Chit Chat at logical time %d", username, ts),
+		LamportTime: ts,
 	})
 	log.Printf("[Server] event=JOIN_BROADCAST client=%s lamport=%d", username, s.clock)
 	s.mu.Unlock() // release the lock while this client is connected

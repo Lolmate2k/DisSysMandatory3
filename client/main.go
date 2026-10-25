@@ -12,6 +12,8 @@ import (
 	"sync/atomic"
 	"syscall"
 	"time"
+	"bufio"
+	"unicode/utf8"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -59,6 +61,26 @@ func main() {
 	client.Join(ctx, &pb.JoinRequest{Username: client.username})
 
 	defer cancel()
+
+	go func() {
+		scanner := bufio.NewScanner(os.Stdin)
+		for (scanner.Scan()) {
+			line := scanner.Text()
+			if line == "" {
+				continue
+			}
+			if utf8.RuneCountInString(line) > 128 {
+				fmt.Println("message too long (max 128 characters)")
+				continue
+			}
+			pubCtx, pubCancel := context.WithTimeout(context.Background(), 5*time.Second)
+			_, err := client.Publish(pubCtx, &pb.PublishRequest{Content: line})
+			pubCancel()
+			if err != nil {
+				fmt.Println("failed to send: ", err)
+			}
+		}
+	}()
 
 	// TODO: join, publish, leave
 	sig := make(chan os.Signal, 1)
