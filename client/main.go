@@ -3,10 +3,14 @@ package main
 import (
 	pb "chitchat/grpc"
 	"context"
+	"flag"
 	"fmt"
 	"io"
 	"log"
+	"os"
+	"os/signal"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"google.golang.org/grpc"
@@ -29,6 +33,12 @@ func newClient(name string, conn *grpc.ClientConn) *chatClient {
 
 func main() {
 
+	name := flag.String("name", "", "your username")
+	flag.Parse()
+	if *name == "" {
+		os.Exit(1)
+	}
+
 	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("failed to connect to server: %v", err)
@@ -36,27 +46,22 @@ func main() {
 	defer conn.Close()
 
 	// Creates two clients and joins them to the chat server:
-	client1 := newClient("user1", conn)
-	client2 := newClient("user2", conn)
+	client := newClient(*name, conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 
-	joinRequest1 := &pb.JoinRequest{Username: client1.username}
-	joinRequest2 := &pb.JoinRequest{Username: client2.username}
-	client1.Join(ctx, joinRequest1)
-	client2.Join(ctx, joinRequest2)
+	client.Join(ctx, &pb.JoinRequest{Username: client.username})
 
 	defer cancel()
 
 	// TODO: join, publish, leave
-	time.Sleep(500 * time.Millisecond)
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
+	<-sig
 
-	client1.Publish(ctx, &pb.PublishRequest{Content: "Hello from user1"})
-	client2.Publish(ctx, &pb.PublishRequest{Content: "Hi user1, user2 here"})
-
-	time.Sleep(1 * time.Second)
-
-	client1.Leave(ctx, &pb.LeaveRequest{Username: client1.username})
-	client2.Leave(ctx, &pb.LeaveRequest{Username: client2.username})
+	// Fresh context: the 10-second ctx above has probably expired by now.
+	leaveCtx, leaveCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	client.Leave(leaveCtx, &pb.LeaveRequest{Username: client.username})
+	leaveCancel()
 
 	time.Sleep(500 * time.Millisecond)
 }
