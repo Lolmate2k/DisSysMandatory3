@@ -7,7 +7,9 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"unicode/utf8"
 
 	"google.golang.org/grpc"
@@ -46,10 +48,22 @@ func main() {
 	}
 	grpcServer := grpc.NewServer()
 	pb.RegisterChitChatServer(grpcServer, newChatServer())
+
 	fmt.Println("[Server] Server listening on :50051")
-	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	log.Printf("[Server] event=SERVER_START addr=:50051")
+
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Printf("[Server] event=SERVE_ERROR err=%v", err)
+		}
+	}()
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
+	<-sig
+
+	log.Printf("[Server] event=SHUTDOWN")
+	grpcServer.Stop()
 }
 
 func (s *chatServer) Join(request *pb.JoinRequest, stream grpc.ServerStreamingServer[pb.Broadcast]) error {
@@ -67,7 +81,7 @@ func (s *chatServer) Join(request *pb.JoinRequest, stream grpc.ServerStreamingSe
 	log.Printf("[Server] event=CLIENT_CONNECT client=%s lamport=%d", username, s.clock)
 	ts := s.tick(0)
 	s.broadcast(&pb.Broadcast{
-		Content:	fmt.Sprintf("Participant %s joined Chit Chat at logical time %d", username, ts),
+		Content:     fmt.Sprintf("Participant %s joined Chit Chat at logical time %d", username, ts),
 		LamportTime: ts,
 	})
 	log.Printf("[Server] event=JOIN_BROADCAST client=%s lamport=%d", username, s.clock)
@@ -150,7 +164,7 @@ func (s *chatServer) Leave(ctx context.Context, request *pb.LeaveRequest) (*pb.L
 		LamportTime: s.clock,
 	})
 	close(s.clients[username])
-	log.Printf("[Server] event=JOIN_BROADCAST client=%s lamport=%d", username, s.clock)
+	log.Printf("[Server] event=LEAVE_BROADCAST client=%s lamport=%d", username, s.clock)
 	log.Printf("[Server] event=CLIENT_LEAVE client=%s lamport=%d", username, s.clock)
 
 	delete(s.clients, username)
